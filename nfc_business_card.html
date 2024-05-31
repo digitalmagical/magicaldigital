@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NFC Business Card</title>
+    <script>
+        if ('NDEFReader' in window) {
+            const nfcReader = new NDEFReader();
+            nfcReader.scan().then(() => {
+                console.log("Scan started successfully.");
+                nfcReader.onreading = event => {
+                    const message = event.message;
+                    for (const record of message.records) {
+                        console.log("Record type: " + record.recordType);
+                        console.log("MIME type: " + record.mediaType);
+                        console.log("Record id: " + record.id);
+                        if (record.recordType === "url") {
+                            const decoder = new TextDecoder(record.encoding);
+                            const url = decoder.decode(record.data);
+                            window.location.href = url; // Redirect to the URL
+                        }
+                    }
+                };
+            }).catch(error => {
+                console.log(`Error: ${error}`);
+            });
+        } else {
+            console.log("Web NFC is not available in this browser.");
+        }
+    </script>
+</head>
+<body>
+    <h1>NFC Business Card</h1>
+    <p>Tap your NFC business card to this device.</p>
+    <p>If your device does not support NFC, please use the QR code or URL below.</p>
+    <!-- Fallback QR code or URL -->
+    <div id="fallback">
+        <p>Scan the QR code:</p>
+        <img src="qr-code.png" alt="QR Code">
+        <p>Or visit: <a href="https://your-business-card-url.com">https://your-business-card-url.com</a></p>
+    </div>
+</body>
+</html>
